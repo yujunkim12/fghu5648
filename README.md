@@ -11,7 +11,7 @@
     /* 회원가입/로그인 오버레이 화면 */
     #authScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #ffe812; z-index: 999;
+      background-color: #ffe812; z-index: 9999;
       display: flex; justify-content: center; align-items: center;
     }
     .auth-box {
@@ -19,29 +19,47 @@
       display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .auth-box h2 { text-align: center; color: #333; }
-    .auth-box input { padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-    .auth-box button { padding: 10px; background-color: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .auth-box input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+    .auth-box button { padding: 12px; background-color: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .auth-box button:hover { background-color: #f5dc00; }
 
-    /* 사이드바 */
-    .sidebar { width: 340px; background-color: #ffe812; display: flex; flex-direction: column; border-right: 1px solid #ddd; height: 100vh; }
-    .sidebar-header { padding: 18px; font-weight: bold; font-size: 16px; background-color: #f7e314; display: flex; justify-content: space-between; align-items: center; }
-    
-    .room-list { flex: 1; overflow-y: auto; background-color: #fffbe9; }
-    .room-item { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 2px; }
+    /* 사이드바 (주요 구조 개편) */
+    .sidebar { width: 320px; min-width: 300px; background-color: #ffe812; display: flex; flex-direction: column; border-right: 1px solid #ddd; height: 100vh; z-index: 10; }
+    .sidebar-header { padding: 15px 18px; font-weight: bold; font-size: 16px; background-color: #f7e314; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 탭 메뉴 (채팅 / 내 프로필) */
+    .tab-menu { display: flex; background-color: #e6ce00; border-bottom: 1px solid #d4bd00; }
+    .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: bold; font-size: 13px; cursor: pointer; color: #555; }
+    .tab-btn.active { background: #fffbe9; color: #000; border-bottom: 3px solid #333; }
+
+    /* 사이드바 메인 콘텐츠 영역 (스크롤 가능) */
+    .tab-content { flex: 1; overflow-y: auto; background-color: #fffbe9; display: none; }
+    .tab-content.active { display: block; }
+
+    .room-item { padding: 15px 18px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; background: white; margin-bottom: 2px; }
     .room-item:hover { background-color: #f5dc00; }
     .room-name { font-weight: bold; font-size: 15px; color: #333; }
     .room-info { font-size: 12px; color: #666; margin-top: 3px; }
 
-    /* 하단 고정 메뉴 버튼 영역 */
-    .sidebar-footer-menu { padding: 15px; display: flex; gap: 10px; background-color: #f7e314; border-top: 1px solid #e0c800; }
+    /* 프로필 탭 전용 UI */
+    .profile-card { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; background: white; margin: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .profile-img-box { width: 90px; height: 90px; border-radius: 50%; background-color: #ddd; display: flex; justify-content: center; align-items: center; font-size: 36px; overflow: hidden; border: 2px solid #ffe812; }
+    .profile-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-name { font-size: 18px; font-weight: bold; }
+    .status-msg { font-size: 13px; color: #666; text-align: center; }
+
+    /* [문제 해결 1] 사이드바 하단 버튼 항상 고정 */
+    .sidebar-footer-menu { padding: 12px 15px; display: flex; gap: 8px; background-color: #f7e314; border-top: 1px solid #e0c800; }
     .sidebar-footer-menu button { flex: 1; padding: 12px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; background: white; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .sidebar-footer-menu button:hover { background: #f0f0f0; }
 
-    /* 메인 채팅창 */
-    .chat-container { flex: 1; display: flex; flex-direction: column; background-color: #bacee0; height: 100vh; }
-    .chat-header { padding: 18px 20px; background-color: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    /* [문제 해결 2] 메인 채팅창 (전체화면 확장) */
+    .chat-container { flex: 1; display: flex; flex-direction: column; background-color: #bacee0; height: 100vh; width: 100%; }
+    .chat-header { padding: 15px 20px; background-color: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
     .chat-header h3 { font-size: 18px; }
+    
+    .back-btn { display: none; background: #eee; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+
     .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
     
     .message { max-width: 65%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.4; position: relative; }
@@ -61,11 +79,21 @@
     .ban-options { display: flex; gap: 10px; }
     .ban-options button { flex: 1; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 4px; font-weight: bold; }
     .ban-options button:hover { background: #e0e0e0; }
+
+    /* 모바일/반응형: 채팅방 클릭 시 전체화면 조절 */
+    @media (max-width: 768px) {
+      .sidebar { width: 100vw; display: flex; }
+      .chat-container { display: none; }
+      
+      body.in-chat .sidebar { display: none; }
+      body.in-chat .chat-container { display: flex; width: 100vw; }
+      body.in-chat .back-btn { display: inline-block; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- 최초 회원가입 / 로그인 화면 -->
+  <!-- 최초 회원가입 화면 -->
   <div id="authScreen">
     <div class="auth-box">
       <h2>💬 간편 회원가입</h2>
@@ -78,32 +106,56 @@
   <!-- 왼쪽: 사이드바 -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <span id="currentUserDisplay">채팅 목록</span>
+      <span id="currentUserDisplay">메신저</span>
       <button class="action-btn" onclick="openSettingsModal()">⚙️ 설정</button>
     </div>
     
-    <!-- 채팅방 목록 영역 (처음엔 비어있거나 생성된 방 표시) -->
-    <div class="room-list" id="roomListContainer">
-      <!-- 동적으로 생성된 방들이 여기에 쌓입니다 -->
+    <!-- 탭 구분: 채팅 vs 내 프로필 -->
+    <div class="tab-menu">
+      <button class="tab-btn active" onclick="switchTab('chatTab', this)">💬 채팅 목록</button>
+      <button class="tab-btn" onclick="switchTab('profileTab', this)">👤 내 프로필</button>
     </div>
 
-    <!-- 하단 고정 메뉴 버튼들 -->
+    <!-- 탭 1: 채팅 목록 -->
+    <div class="tab-content active" id="chatTab">
+      <div class="room-list" id="roomListContainer">
+        <!-- 생성된 채팅방들이 여기에 쌓입니다 -->
+      </div>
+    </div>
+
+    <!-- 탭 2: 내 프로필 (독립 화면) -->
+    <div class="tab-content" id="profileTab">
+      <div class="profile-card">
+        <div class="profile-img-box" id="profileImgPreview">👤</div>
+        <div class="profile-name" id="myProfileName">-</div>
+        <div class="status-msg" id="myStatusMsg">상태 메시지가 없습니다.</div>
+        
+        <hr style="width: 100%; border: 0; border-top: 1px solid #eee;">
+        
+        <button onclick="editProfile()" style="width: 100%; padding: 10px; background: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">프로필 수정</button>
+      </div>
+    </div>
+
+    <!-- 하단 고정 메뉴 버튼 (채팅방 추가 / 친구 초대) -->
     <div class="sidebar-footer-menu">
       <button onclick="openCreateRoomModal()">➕ 방 만들기</button>
       <button onclick="openInviteModal()">👥 친구 초대</button>
     </div>
   </div>
 
-  <!-- 오른쪽: 메인 채팅창 -->
+  <!-- 오른쪽: 메인 채팅창 (확장 전체화면) -->
   <div class="chat-container">
     <div class="chat-header">
-      <h3 id="currentRoomTitle">채팅방을 선택하거나 만들어주세요</h3>
+      <div style="display: flex; align-items: center;">
+        <button class="back-btn" onclick="leaveChatRoom()">◀ 목록</button>
+        <h3 id="currentRoomTitle">채팅방을 선택하거나 만들어주세요</h3>
+      </div>
       <span id="currentRoomParticipants" style="font-size: 13px; color: #666;">참여 0명</span>
     </div>
 
     <div class="chat-messages" id="chatMessages">
       <div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">
-        왼쪽 하단에서 '➕ 방 만들기'를 눌러 새로운 채팅방을 시작해보세요!
+        왼쪽 하단의 '➕ 방 만들기' 버튼을 눌러 새 채팅방을 생성하세요!
       </div>
     </div>
 
@@ -138,7 +190,7 @@
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
       <h3>➕ 새로운 채팅방 만들기</h3>
-      <label style="font-size: 12px;">채팅방 이름 (또는 상대방 이름):</label>
+      <label style="font-size: 12px;">채팅방 이름:</label>
       <input type="text" id="newRoomNameInput" placeholder="예: 개발자 스터디룸" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
       
       <label style="font-size: 12px; margin-top: 5px;">방 유형 선택:</label>
@@ -170,15 +222,15 @@
   <script>
     let isAdmin = false;
     let currentActiveRoom = '';
-    
     let registeredUsers = ['User1', 'User2'];
-    let chatRooms = {}; // 기본 방 제거됨
+    let chatRooms = {};
 
     window.onload = function() {
       const savedUser = localStorage.getItem('chat_nickname');
       if (savedUser) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('currentUserDisplay').textContent = `${savedUser} 님`;
+        document.getElementById('myProfileName').textContent = savedUser;
         
         if (!registeredUsers.includes(savedUser)) registeredUsers.push(savedUser);
       }
@@ -200,19 +252,30 @@
       localStorage.setItem('chat_nickname', nickname);
       registeredUsers.push(nickname);
 
-      alert(`${nickname}님 환영합니다! 회원가입이 완료되었습니다.`);
+      alert(`${nickname}님 환영합니다!`);
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('currentUserDisplay').textContent = `${nickname} 님`;
+      document.getElementById('myProfileName').textContent = nickname;
     }
 
-    function handleLogout() {
-      if (confirm('정말 로그아웃 하시겠습니까? 저장된 계정이 초기화됩니다.')) {
-        localStorage.removeItem('chat_nickname');
-        location.reload();
+    // 탭 전환 (채팅 vs 내 프로필)
+    function switchTab(tabId, btnElem) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      btnElem.classList.add('active');
+    }
+
+    // 프로필 수정
+    function editProfile() {
+      const newStatus = prompt('변경할 상태 메시지를 입력하세요:', document.getElementById('myStatusMsg').textContent);
+      if (newStatus !== null) {
+        document.getElementById('myStatusMsg').textContent = newStatus || '상태 메시지가 없습니다.';
       }
     }
 
-    // 채팅방 클릭 시 정상 입장 처리
+    // 채팅방 클릭 시 전체화면 확장 진입
     function enterRoom(roomName) {
       currentActiveRoom = roomName;
       document.getElementById('currentRoomTitle').textContent = roomName;
@@ -220,9 +283,15 @@
       const pList = chatRooms[roomName] ? chatRooms[roomName].participants : [];
       document.getElementById('currentRoomParticipants').textContent = `참여 ${pList.length}명 (${pList.join(', ')})`;
       
-      // 채팅창 화면 초기화 및 환영 메시지
       const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${roomName}' 대화방에 입장했습니다.</div>`;
+      chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${roomName}' 방에 입장했습니다.</div>`;
+
+      // 전체화면 클래스 토글 (모바일 기기 전용)
+      document.body.classList.add('in-chat');
+    }
+
+    function leaveChatRoom() {
+      document.body.classList.remove('in-chat');
     }
 
     function openCreateRoomModal() {
@@ -230,7 +299,6 @@
       document.getElementById('createRoomModal').style.display = 'flex';
     }
 
-    // 채팅방 생성 로직
     function createRoom(type) {
       const roomName = document.getElementById('newRoomNameInput').value.trim();
       if (!roomName) {
@@ -244,13 +312,11 @@
       }
 
       const currentUser = localStorage.getItem('chat_nickname') || '나';
-      chatRooms[roomName] = { type: type, participants: [currentUser], messages: [] };
+      chatRooms[roomName] = { type: type, participants: [currentUser] };
 
-      // 사이드바 목록에 동적 추가
       const container = document.getElementById('roomListContainer');
       const roomDiv = document.createElement('div');
       roomDiv.className = 'room-item';
-      roomDiv.id = `room-elem-${roomName}`;
       roomDiv.onclick = function() { enterRoom(roomName); };
       roomDiv.innerHTML = `
         <div>
@@ -267,7 +333,7 @@
 
     function openInviteModal() {
       if (!currentActiveRoom) {
-        alert('먼저 입장하거나 생성한 채팅방을 선택해주세요!');
+        alert('먼저 채팅방을 선택하거나 만들어주세요!');
         return;
       }
       document.getElementById('inviteTargetRoomName').textContent = currentActiveRoom;
@@ -346,6 +412,13 @@
         document.getElementById('adminPanel').style.display = 'block';
       } else {
         alert('비밀번호가 올바르지 않습니다.');
+      }
+    }
+
+    function handleLogout() {
+      if (confirm('정말 로그아웃 하시겠습니까? 저장된 계정이 초기화됩니다.')) {
+        localStorage.removeItem('chat_nickname');
+        location.reload();
       }
     }
 
