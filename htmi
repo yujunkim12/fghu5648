@@ -23,10 +23,10 @@
     .auth-box button { padding: 12px; background-color: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .auth-box button:hover { background-color: #f5dc00; }
 
-    /* 왼쪽 메뉴 바 */
+    /* 왼쪽 고정 메뉴 바 */
     .left-menu-bar { 
       width: 240px; background-color: #2b2b2b; display: flex; flex-direction: column; 
-      justify-content: space-between; height: 100vh; border-right: 1px solid #1a1a1a; 
+      height: 100vh; border-right: 1px solid #1a1a1a; 
     }
     .menu-items-group { display: flex; flex-direction: column; padding: 15px 12px; gap: 10px; }
     
@@ -37,7 +37,14 @@
     }
     .menu-btn:hover, .menu-btn.active { background-color: #ffe812; color: #000; }
 
-    .menu-bottom-group { padding: 15px 12px; border-top: 1px solid #3d3d3d; display: flex; flex-direction: column; gap: 8px; }
+    .menu-bottom-group { 
+      margin-top: auto; 
+      padding: 15px 12px; 
+      border-top: 1px solid #3d3d3d; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+    }
 
     /* 우측 메인 콘텐츠 패널 영역 */
     .main-panel-area { flex: 1; display: flex; height: 100vh; background-color: #fffbe9; position: relative; overflow: hidden; }
@@ -63,7 +70,7 @@
     .profile-nickname-text { font-size: 24px; font-weight: bold; }
     .profile-status-text { font-size: 15px; color: #666; }
 
-    /* 실제 개별 채팅방 전체화면 뷰 */
+    /* 개별 채팅방 뷰 */
     #chatRoomView { display: none; flex-direction: column; flex: 1; height: 100vh; background-color: #bacee0; }
     #chatRoomView.active { display: flex; }
 
@@ -125,11 +132,11 @@
       <div class="list-container" id="roomListContainer"></div>
     </div>
 
-    <!-- 2. 친구 목록 탭 (추가된 친구 확인 및 프로필 보기용) -->
+    <!-- 2. 친구 목록 탭 -->
     <div class="content-tab" id="tabFriendsList">
       <div class="tab-header"><span>👥 추가된 친구 목록</span></div>
       <div class="list-container" id="friendsListContainer">
-        <div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다. '친구 추가'를 통해 친구를 등록해보세요![cite: 1]</div>
+        <div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다. '친구 추가'를 통해 친구를 등록해보세요!</div>
       </div>
     </div>
 
@@ -137,7 +144,6 @@
     <div class="content-tab" id="tabProfile">
       <div class="tab-header"><span>👤 내 프로필</span></div>
       <div class="profile-content-box">
-        <!-- 프로필 사진 클릭 또는 버튼을 통해 갤러리 파일 선택 가능 -->
         <div class="profile-big-avatar" id="profileImgContainer" onclick="document.getElementById('galleryInput').click()" title="클릭해서 사진 변경">
           <span id="profileEmoji">😊</span>
           <img id="profilePreviewImg" src="" style="display:none;" />
@@ -164,11 +170,7 @@
         <span id="currentRoomParticipants" style="font-size: 13px; color: #666;">참여 1명</span>
       </div>
 
-      <div class="chat-messages-box" id="chatMessages">
-        <div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">
-          대화방에 입장했습니다. 자유롭게 대화를 시작해보세요!
-        </div>
-      </div>
+      <div class="chat-messages-box" id="chatMessages"></div>
 
       <div class="chat-bottom-input-area">
         <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
@@ -191,11 +193,11 @@
     </div>
   </div>
 
-  <!-- 모달 2: 관리자 설정 -->
+  <!-- 모달 2: 관리자 설정 (비밀번호 숨김 처리) -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
       <h3>⚙️ 관리자 설정 (비밀번호 인증)</h3>
-      <label style="font-size: 13px; font-weight: bold;">🔒 관리자 비밀번호 (1217)</label>
+      <label style="font-size: 13px; font-weight: bold;">🔒 관리자 비밀번호</label>
       <input type="password" id="adminPassword" placeholder="비밀번호 입력" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
       <button onclick="verifyAdmin()" style="padding: 10px; background: #333; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">인증하기</button>
       
@@ -214,6 +216,9 @@
       <label style="font-size: 13px;">채팅방 이름:</label>
       <input type="text" id="newRoomNameInput" placeholder="예: 재밌는 방" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
       
+      <label style="font-size: 13px; margin-top: 5px;">대화할 상대방 (가입된 닉네임):</label>
+      <input type="text" id="targetFriendInput" placeholder="예: User1 (선택 사항)" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+
       <label style="font-size: 13px; margin-top: 5px;">방 유형:</label>
       <div class="ban-options">
         <button onclick="createRoom('1:1 채팅')">1:1 채팅</button>
@@ -243,11 +248,11 @@
   <script>
     let isAdmin = false;
     let currentActiveRoom = '';
-    let registeredUsers = ['User1', 'User2'];
-    let chatRooms = {};
     
-    // 추가된 친구들과 그들의 상세 정보를 저장하는 객체 (프로필/상태메시지/사진 포함)
-    let addedFriends = {
+    let registeredUsers = JSON.parse(localStorage.getItem('chat_registered_users')) || ['User1', 'User2'];
+    let chatRooms = JSON.parse(localStorage.getItem('chat_saved_rooms')) || {};
+
+    let addedFriends = JSON.parse(localStorage.getItem('chat_added_friends')) || {
       'User1': { status: '안녕하세요! User1입니다.', avatar: '' },
       'User2': { status: '반갑습니다.', avatar: '' }
     };
@@ -257,10 +262,12 @@
       if (savedUser) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('myProfileName').textContent = savedUser;
-        if (!registeredUsers.includes(savedUser)) registeredUsers.push(savedUser);
+        if (!registeredUsers.includes(savedUser)) {
+          registeredUsers.push(savedUser);
+          localStorage.setItem('chat_registered_users', JSON.stringify(registeredUsers));
+        }
       }
 
-      // [기능 1] 새로고침해도 상태 메시지와 프로필 사진이 유지되도록 불러오기[cite: 1]
       const savedStatus = localStorage.getItem('chat_status_msg');
       if (savedStatus) {
         document.getElementById('myStatusMsg').textContent = savedStatus;
@@ -270,6 +277,9 @@
       if (savedImage) {
         applyProfileImage(savedImage);
       }
+
+      renderFriendsList();
+      renderChatRoomsList();
     };
 
     function handleRegister() {
@@ -278,26 +288,30 @@
         alert('닉네임을 입력해주세요!');
         return;
       }
-      if (registeredUsers.map(u => u.toLowerCase()).includes(nickname.toLowerCase())) {
-        alert('이미 사용 중인 닉네임입니다.');
+
+      const isDuplicate = registeredUsers.some(u => u.toLowerCase() === nickname.toLowerCase());
+      if (isDuplicate) {
+        alert(`'${nickname}'은(는) 이미 누군가 사용 중인 닉네임입니다. 다른 닉네임을 입력해 주세요.`);
         return;
       }
-      localStorage.setItem('chat_nickname', nickname);
+
       registeredUsers.push(nickname);
+      localStorage.setItem('chat_registered_users', JSON.stringify(registeredUsers));
+      localStorage.setItem('chat_nickname', nickname);
 
       alert(`${nickname}님 환영합니다!`);
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('myProfileName').textContent = nickname;
+      renderFriendsList();
     }
 
-    // [기능 2] 갤러리에서 선택한 이미지를 읽어와서 저장 및 반영하기[cite: 1]
     function loadGalleryImage(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
           const base64Image = e.target.result;
-          localStorage.setItem('chat_profile_img', base64Image); // 브라우저 영구 저장[cite: 1]
+          localStorage.setItem('chat_profile_img', base64Image);
           applyProfileImage(base64Image);
         };
         reader.readAsDataURL(file);
@@ -313,18 +327,16 @@
       imgElem.src = imgSrc;
     }
 
-    // [기능 1] 상태 메시지 영구 수정 및 저장[cite: 1]
     function editProfile() {
       const currentMsg = document.getElementById('myStatusMsg').textContent;
       const newStatus = prompt('변경할 상태 메시지를 입력하세요:', currentMsg === '상태 메시지가 없습니다.' ? '' : currentMsg);
       if (newStatus !== null) {
         const finalMsg = newStatus.trim() || '상태 메시지가 없습니다.';
         document.getElementById('myStatusMsg').textContent = finalMsg;
-        localStorage.setItem('chat_status_msg', finalMsg); // 영구 저장[cite: 1]
+        localStorage.setItem('chat_status_msg', finalMsg);
       }
     }
 
-    // 탭 전환
     function switchMainTab(tabId) {
       closeChatRoom();
 
@@ -337,7 +349,6 @@
       if (tabId === 'tabProfile') document.getElementById('btnTabProfile').classList.add('active');
     }
 
-    // [기능 3] 친구 목록 탭에 추가된 친구들을 렌더링하고 클릭 시 프로필 팝업 띄우기[cite: 1]
     function renderFriendsList() {
       const container = document.getElementById('friendsListContainer');
       const friendNames = Object.keys(addedFriends);
@@ -352,7 +363,7 @@
         const fData = addedFriends[fName];
         const item = document.createElement('div');
         item.className = 'list-item';
-        item.onclick = function() { openFriendProfile(fName); }; // 클릭 시 프로필 보기[cite: 1]
+        item.onclick = function() { openFriendProfile(fName); };
         
         let avatarContent = `👤`;
         if (fData.avatar) {
@@ -370,7 +381,38 @@
       });
     }
 
-    // 친구 프로필 모달 열기[cite: 1]
+    function renderChatRoomsList() {
+      const container = document.getElementById('roomListContainer');
+      const roomNames = Object.keys(chatRooms);
+      const currentUser = localStorage.getItem('chat_nickname') || '나';
+
+      const myRooms = roomNames.filter(rName => chatRooms[rName].participants.includes(currentUser));
+
+      if (myRooms.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: #777;">참여 중인 대화방이 없습니다. '채팅창 생성하기'로 방을 만들어보세요!</div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      myRooms.forEach(roomName => {
+        const roomData = chatRooms[roomName];
+        const lastMsgObj = roomData.messages && roomData.messages.length > 0 ? roomData.messages[roomData.messages.length - 1] : null;
+        const lastMsgText = lastMsgObj ? `${lastMsgObj.sender}: ${lastMsgObj.text}` : '대화 내역이 없습니다.';
+
+        const roomDiv = document.createElement('div');
+        roomDiv.className = 'list-item';
+        roomDiv.onclick = function() { enterRoom(roomName); };
+        roomDiv.innerHTML = `
+          <div class="item-avatar">💬</div>
+          <div>
+            <div class="item-name">${roomName}</div>
+            <div class="item-sub" id="info-${roomName}">${lastMsgText} (${roomData.participants.length}명)</div>
+          </div>
+        `;
+        container.appendChild(roomDiv);
+      });
+    }
+
     function openFriendProfile(fName) {
       const fData = addedFriends[fName];
       document.getElementById('modalFriendName').textContent = fName;
@@ -390,14 +432,41 @@
       currentActiveRoom = roomName;
       document.getElementById('currentRoomTitle').textContent = roomName;
       
-      const pList = chatRooms[roomName] ? chatRooms[roomName].participants : [];
+      const roomData = chatRooms[roomName];
+      const pList = roomData ? roomData.participants : [];
       document.getElementById('currentRoomParticipants').textContent = `참여 ${pList.length}명 (${pList.join(', ')})`;
       
-      const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${roomName}' 대화방에 입장했습니다.</div>`;
+      renderMessages();
 
       document.querySelectorAll('.content-tab').forEach(el => el.classList.remove('active'));
       document.getElementById('chatRoomView').classList.add('active');
+    }
+
+    function renderMessages() {
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '';
+
+      const roomData = chatRooms[currentActiveRoom];
+      const currentUser = localStorage.getItem('chat_nickname') || '나';
+
+      if (!roomData || !roomData.messages || roomData.messages.length === 0) {
+        chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${currentActiveRoom}' 방에 입장했습니다. 대화를 시작해보세요!</div>`;
+        return;
+      }
+
+      roomData.messages.forEach(msg => {
+        const msgDiv = document.createElement('div');
+        if (msg.sender === currentUser) {
+          msgDiv.className = 'message sent';
+          msgDiv.innerHTML = `<div class="sender-name">${msg.sender}</div>${msg.text}`;
+        } else {
+          msgDiv.className = 'message received';
+          msgDiv.innerHTML = `<div class="sender-name">${msg.sender}</div>${msg.text}`;
+        }
+        chatMessages.appendChild(msgDiv);
+      });
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function closeChatRoom() {
@@ -408,11 +477,15 @@
 
     function openCreateRoomModal() {
       document.getElementById('newRoomNameInput').value = '';
+      document.getElementById('targetFriendInput').value = '';
       document.getElementById('createRoomModal').style.display = 'flex';
     }
 
     function createRoom(type) {
       const roomName = document.getElementById('newRoomNameInput').value.trim();
+      const targetFriend = document.getElementById('targetFriendInput').value.trim();
+      const currentUser = localStorage.getItem('chat_nickname') || '나';
+
       if (!roomName) {
         alert('채팅방 이름을 입력해주세요!');
         return;
@@ -422,25 +495,32 @@
         return;
       }
 
-      const currentUser = localStorage.getItem('chat_nickname') || '나';
-      chatRooms[roomName] = { type: type, participants: [currentUser] };
+      const participants = [currentUser];
 
-      const container = document.getElementById('roomListContainer');
-      const roomDiv = document.createElement('div');
-      roomDiv.className = 'list-item';
-      roomDiv.onclick = function() { enterRoom(roomName); };
-      roomDiv.innerHTML = `
-        <div class="item-avatar">💬</div>
-        <div>
-          <div class="item-name">${roomName}</div>
-          <div class="item-sub" id="info-${roomName}">${type} • 참여 1명</div>
-        </div>
-      `;
-      container.appendChild(roomDiv);
+      if (targetFriend) {
+        const isRegistered = registeredUsers.some(u => u.toLowerCase() === targetFriend.toLowerCase());
+        if (!isRegistered) {
+          alert(`'${targetFriend}' 님은 가입되어 있지 않은 회원입니다.`);
+          return;
+        }
+        if (targetFriend !== currentUser) {
+          participants.push(targetFriend);
+        }
+      }
 
+      chatRooms[roomName] = { 
+        type: type, 
+        participants: participants,
+        messages: [] 
+      };
+
+      localStorage.setItem('chat_saved_rooms', JSON.stringify(chatRooms));
       closeModal('createRoomModal');
+
       switchMainTab('tabChatList');
-      enterRoom(roomName);
+      renderChatRoomsList();
+
+      alert(`'${roomName}' 대화방이 생성되었습니다!`);
     }
 
     function openInviteModal() {
@@ -454,7 +534,6 @@
       document.getElementById('inviteModal').style.display = 'flex';
     }
 
-    // [기능 3] 친구 추가 시 '친구 목록'에 자동 등록되도록 구현[cite: 1]
     function searchAndInviteFriend() {
       const friendName = document.getElementById('friendSearchInput').value.trim();
       const resultArea = document.getElementById('searchResultArea');
@@ -468,53 +547,63 @@
         resultArea.innerHTML = `<span style="color: red;">자기 자신은 추가할 수 없습니다.</span>`;
         return;
       }
-      if (!registeredUsers.map(u => u.toLowerCase()).includes(friendName.toLowerCase())) {
+      
+      const isRegistered = registeredUsers.some(u => u.toLowerCase() === friendName.toLowerCase());
+      if (!isRegistered) {
         resultArea.innerHTML = `<span style="color: red;">🚫 가입되지 않은 회원입니다.</span>`;
         return;
       }
 
-      // 친구 목록(addedFriends)에 없으면 새로 등록
       if (!addedFriends[friendName]) {
         addedFriends[friendName] = { status: '반갑습니다!', avatar: '' };
+        localStorage.setItem('chat_added_friends', JSON.stringify(addedFriends));
       }
 
-      // 채팅방 참여 중인지 체크
       if (chatRooms[currentActiveRoom].participants.includes(friendName)) {
-        resultArea.innerHTML = `<span style="color: red;">이미 이 방에 참여 중인 친구입니다.</span>`;
+        resultArea.innerHTML = `<span style="color: red;">이미 참여 중인 회원입니다.</span>`;
         return;
       }
 
       chatRooms[currentActiveRoom].participants.push(friendName);
-      renderFriendsList(); // 친구 목록 갱신[cite: 1]
+      localStorage.setItem('chat_saved_rooms', JSON.stringify(chatRooms));
 
-      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 친구 추가 및 방에 초대했습니다![cite: 1]</span>`;
+      renderFriendsList();
+      renderChatRoomsList();
+
+      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 대화 상대방으로 추가했습니다!</span>`;
       
       const pCount = chatRooms[currentActiveRoom].participants.length;
-      const typeStr = chatRooms[currentActiveRoom].type;
-      const infoElem = document.getElementById(`info-${currentActiveRoom}`);
-      if (infoElem) infoElem.textContent = `${typeStr} • 참여 ${pCount}명`;
+      document.getElementById('currentRoomParticipants').textContent = `참여 ${pCount}명 (${chatRooms[currentActiveRoom].participants.join(', ')})`;
 
       setTimeout(() => {
         closeModal('inviteModal');
-        enterRoom(currentActiveRoom);
       }, 1000);
     }
 
     function sendMessage() {
       if (!currentActiveRoom) return;
       const input = document.getElementById('messageInput');
-      if (!input.value.trim()) return;
+      const text = input.value.trim();
+      if (!text) return;
 
       const currentNick = localStorage.getItem('chat_nickname') || '나';
-      const chatMessages = document.getElementById('chatMessages');
-      
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'message sent';
-      msgDiv.innerHTML = `<div class="sender-name">${currentNick}</div>${input.value}`;
-      chatMessages.appendChild(msgDiv);
+
+      if (!chatRooms[currentActiveRoom].messages) {
+        chatRooms[currentActiveRoom].messages = [];
+      }
+
+      chatRooms[currentActiveRoom].messages.push({
+        sender: currentNick,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      localStorage.setItem('chat_saved_rooms', JSON.stringify(chatRooms));
+
+      renderMessages();
+      renderChatRoomsList();
 
       input.value = '';
-      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function openSettingsModal() {
