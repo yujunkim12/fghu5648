@@ -8,7 +8,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; }
     body { display: flex; height: 100vh; width: 100vw; background-color: #f0f0f0; overflow: hidden; }
 
-    /* 회원가입/로그인 오버레이 화면 */
+    /* 최초 회원가입 화면 */
     #authScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #ffe812; z-index: 9999;
@@ -23,72 +23,68 @@
     .auth-box button { padding: 12px; background-color: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .auth-box button:hover { background-color: #f5dc00; }
 
-    /* 사이드바 (주요 구조 개편) */
-    .sidebar { width: 320px; min-width: 300px; background-color: #ffe812; display: flex; flex-direction: column; border-right: 1px solid #ddd; height: 100vh; z-index: 10; }
-    .sidebar-header { padding: 15px 18px; font-weight: bold; font-size: 16px; background-color: #f7e314; display: flex; justify-content: space-between; align-items: center; }
-
-    /* 탭 메뉴 (채팅 / 내 프로필) */
-    .tab-menu { display: flex; background-color: #e6ce00; border-bottom: 1px solid #d4bd00; }
-    .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: bold; font-size: 13px; cursor: pointer; color: #555; }
-    .tab-btn.active { background: #fffbe9; color: #000; border-bottom: 3px solid #333; }
-
-    /* 사이드바 메인 콘텐츠 영역 (스크롤 가능) */
-    .tab-content { flex: 1; overflow-y: auto; background-color: #fffbe9; display: none; }
-    .tab-content.active { display: block; }
-
-    .room-item { padding: 15px 18px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; background: white; margin-bottom: 2px; }
-    .room-item:hover { background-color: #f5dc00; }
-    .room-name { font-weight: bold; font-size: 15px; color: #333; }
-    .room-info { font-size: 12px; color: #666; margin-top: 3px; }
-
-    /* 프로필 탭 전용 UI */
-    .profile-card { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; background: white; margin: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .profile-img-box { width: 90px; height: 90px; border-radius: 50%; background-color: #ddd; display: flex; justify-content: center; align-items: center; font-size: 36px; overflow: hidden; border: 2px solid #ffe812; }
-    .profile-img-box img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-name { font-size: 18px; font-weight: bold; }
-    .status-msg { font-size: 13px; color: #666; text-align: center; }
-
-    /* [문제 해결 1] 사이드바 하단 버튼 항상 고정 */
-    .sidebar-footer-menu { padding: 12px 15px; display: flex; gap: 8px; background-color: #f7e314; border-top: 1px solid #e0c800; }
-    .sidebar-footer-menu button { flex: 1; padding: 12px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; background: white; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .sidebar-footer-menu button:hover { background: #f0f0f0; }
-
-    /* [문제 해결 2] 메인 채팅창 (전체화면 확장) */
-    .chat-container { flex: 1; display: flex; flex-direction: column; background-color: #bacee0; height: 100vh; width: 100%; }
-    .chat-header { padding: 15px 20px; background-color: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
-    .chat-header h3 { font-size: 18px; }
+    /* 왼쪽 메뉴 바 */
+    .left-menu-bar { 
+      width: 240px; background-color: #2b2b2b; display: flex; flex-direction: column; 
+      justify-content: space-between; height: 100vh; border-right: 1px solid #1a1a1a; 
+    }
+    .menu-items-group { display: flex; flex-direction: column; padding: 15px 12px; gap: 10px; }
     
-    .back-btn { display: none; background: #eee; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+    .menu-btn {
+      background-color: #3d3d3d; color: white; border: none; padding: 15px; 
+      border-radius: 8px; font-size: 16px; font-weight: bold; text-align: left; 
+      cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+    }
+    .menu-btn:hover, .menu-btn.active { background-color: #ffe812; color: #000; }
 
-    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-    
-    .message { max-width: 65%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.4; position: relative; }
+    .menu-bottom-group { padding: 15px 12px; border-top: 1px solid #3d3d3d; display: flex; flex-direction: column; gap: 8px; }
+
+    /* 우측 메인 콘텐츠 패널 영역 */
+    .main-panel-area { flex: 1; display: flex; height: 100vh; background-color: #fffbe9; position: relative; overflow: hidden; }
+
+    .content-tab { display: none; width: 100%; height: 100%; flex-direction: column; background-color: #fff; }
+    .content-tab.active { display: flex; }
+
+    .tab-header { padding: 20px 25px; background-color: #f7e314; font-size: 20px; font-weight: bold; border-bottom: 1px solid #e0c800; display: flex; justify-content: space-between; align-items: center; }
+
+    /* 대화방 및 친구 목록 스타일 */
+    .list-container { flex: 1; overflow-y: auto; }
+    .list-item { padding: 18px 25px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 15px; }
+    .list-item:hover { background-color: #f9f9f9; }
+    .item-avatar { width: 45px; height: 45px; border-radius: 50%; background-color: #ddd; display: flex; justify-content: center; align-items: center; overflow: hidden; font-size: 20px; }
+    .item-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .item-name { font-size: 16px; font-weight: bold; color: #333; }
+    .item-sub { font-size: 13px; color: #777; margin-top: 3px; }
+
+    /* 프로필 탭 스타일 */
+    .profile-content-box { padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 15px; }
+    .profile-big-avatar { width: 120px; height: 120px; border-radius: 50%; background-color: #ffe812; display: flex; justify-content: center; align-items: center; font-size: 50px; border: 3px solid #333; overflow: hidden; cursor: pointer; position: relative; }
+    .profile-big-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-nickname-text { font-size: 24px; font-weight: bold; }
+    .profile-status-text { font-size: 15px; color: #666; }
+
+    /* 실제 개별 채팅방 전체화면 뷰 */
+    #chatRoomView { display: none; flex-direction: column; flex: 1; height: 100vh; background-color: #bacee0; }
+    #chatRoomView.active { display: flex; }
+
+    .chat-room-header { padding: 18px 25px; background-color: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    .chat-messages-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+
+    .message { max-width: 65%; padding: 12px 16px; border-radius: 12px; font-size: 15px; line-height: 1.4; position: relative; }
     .message.received { background-color: white; align-self: flex-start; }
     .message.sent { background-color: #ffe812; align-self: flex-end; }
     .sender-name { font-size: 12px; color: #555; margin-bottom: 4px; font-weight: bold; }
 
-    .chat-input-area { padding: 15px 20px; background-color: white; display: flex; gap: 12px; border-top: 1px solid #ddd; }
-    .chat-input-area input { flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; outline: none; font-size: 14px; }
-    .chat-input-area button { padding: 12px 25px; background-color: #ffe812; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-    .chat-input-area button:hover { background-color: #f5dc00; }
+    .chat-bottom-input-area { padding: 15px 25px; background-color: white; display: flex; gap: 15px; border-top: 1px solid #ddd; align-items: center; }
+    .chat-bottom-input-area input { flex: 1; padding: 14px 18px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 15px; }
+    .send-btn-style { padding: 14px 28px; background-color: #ffe812; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; }
+    .send-btn-style:hover { background-color: #f5dc00; }
 
-    /* 공통 버튼 & 모달 스타일 */
-    .action-btn { background-color: #333; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: white; padding: 24px; border-radius: 10px; width: 420px; display: flex; flex-direction: column; gap: 14px; }
+    /* 공통 모달 팝업 창 */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 10000; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 420px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     .ban-options { display: flex; gap: 10px; }
-    .ban-options button { flex: 1; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 4px; font-weight: bold; }
-    .ban-options button:hover { background: #e0e0e0; }
-
-    /* 모바일/반응형: 채팅방 클릭 시 전체화면 조절 */
-    @media (max-width: 768px) {
-      .sidebar { width: 100vw; display: flex; }
-      .chat-container { display: none; }
-      
-      body.in-chat .sidebar { display: none; }
-      body.in-chat .chat-container { display: flex; width: 100vw; }
-      body.in-chat .back-btn { display: inline-block; }
-    }
+    .ban-options button { flex: 1; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; cursor: pointer; border-radius: 6px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -103,119 +99,144 @@
     </div>
   </div>
 
-  <!-- 왼쪽: 사이드바 -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <span id="currentUserDisplay">메신저</span>
-      <button class="action-btn" onclick="openSettingsModal()">⚙️ 설정</button>
-    </div>
-    
-    <!-- 탭 구분: 채팅 vs 내 프로필 -->
-    <div class="tab-menu">
-      <button class="tab-btn active" onclick="switchTab('chatTab', this)">💬 채팅 목록</button>
-      <button class="tab-btn" onclick="switchTab('profileTab', this)">👤 내 프로필</button>
+  <!-- 왼쪽 고정 메뉴 바 -->
+  <div class="left-menu-bar">
+    <div class="menu-items-group">
+      <h3 style="color: #ffe812; padding: 5px 10px; font-size: 18px; margin-bottom: 5px;">카카오톡 메뉴</h3>
+      <button class="menu-btn" onclick="openCreateRoomModal()">➕ 채팅창 생성하기</button>
+      <button class="menu-btn" onclick="openInviteModal()">👥 친구 추가(초대)</button>
+      <button class="menu-btn active" id="btnTabChat" onclick="switchMainTab('tabChatList')">💬 대화창 목록</button>
+      <button class="menu-btn" id="btnTabFriends" onclick="switchMainTab('tabFriendsList')">👥 친구 목록</button>
+      <button class="menu-btn" id="btnTabProfile" onclick="switchMainTab('tabProfile')">👤 프로필</button>
     </div>
 
-    <!-- 탭 1: 채팅 목록 -->
-    <div class="tab-content active" id="chatTab">
-      <div class="room-list" id="roomListContainer">
-        <!-- 생성된 채팅방들이 여기에 쌓입니다 -->
-      </div>
-    </div>
-
-    <!-- 탭 2: 내 프로필 (독립 화면) -->
-    <div class="tab-content" id="profileTab">
-      <div class="profile-card">
-        <div class="profile-img-box" id="profileImgPreview">👤</div>
-        <div class="profile-name" id="myProfileName">-</div>
-        <div class="status-msg" id="myStatusMsg">상태 메시지가 없습니다.</div>
-        
-        <hr style="width: 100%; border: 0; border-top: 1px solid #eee;">
-        
-        <button onclick="editProfile()" style="width: 100%; padding: 10px; background: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">프로필 수정</button>
-      </div>
-    </div>
-
-    <!-- 하단 고정 메뉴 버튼 (채팅방 추가 / 친구 초대) -->
-    <div class="sidebar-footer-menu">
-      <button onclick="openCreateRoomModal()">➕ 방 만들기</button>
-      <button onclick="openInviteModal()">👥 친구 초대</button>
+    <div class="menu-bottom-group">
+      <button class="menu-btn" onclick="openSettingsModal()" style="background-color: #444; font-size: 14px;">⚙️ 관리자 설정</button>
+      <button class="menu-btn" onclick="handleLogout()" style="background-color: #a83232; font-size: 14px;">🚪 로그아웃</button>
     </div>
   </div>
 
-  <!-- 오른쪽: 메인 채팅창 (확장 전체화면) -->
-  <div class="chat-container">
-    <div class="chat-header">
-      <div style="display: flex; align-items: center;">
-        <button class="back-btn" onclick="leaveChatRoom()">◀ 목록</button>
-        <h3 id="currentRoomTitle">채팅방을 선택하거나 만들어주세요</h3>
-      </div>
-      <span id="currentRoomParticipants" style="font-size: 13px; color: #666;">참여 0명</span>
+  <!-- 우측 메인 콘텐츠 패널 영역 -->
+  <div class="main-panel-area">
+
+    <!-- 1. 대화창 목록 탭 -->
+    <div class="content-tab active" id="tabChatList">
+      <div class="tab-header"><span>💬 대화방 목록</span></div>
+      <div class="list-container" id="roomListContainer"></div>
     </div>
 
-    <div class="chat-messages" id="chatMessages">
-      <div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">
-        왼쪽 하단의 '➕ 방 만들기' 버튼을 눌러 새 채팅방을 생성하세요!
+    <!-- 2. 친구 목록 탭 (추가된 친구 확인 및 프로필 보기용) -->
+    <div class="content-tab" id="tabFriendsList">
+      <div class="tab-header"><span>👥 추가된 친구 목록</span></div>
+      <div class="list-container" id="friendsListContainer">
+        <div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다. '친구 추가'를 통해 친구를 등록해보세요![cite: 1]</div>
       </div>
     </div>
 
-    <div class="chat-input-area">
-      <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
-      <button onclick="sendMessage()">전송</button>
+    <!-- 3. 프로필 탭 -->
+    <div class="content-tab" id="tabProfile">
+      <div class="tab-header"><span>👤 내 프로필</span></div>
+      <div class="profile-content-box">
+        <!-- 프로필 사진 클릭 또는 버튼을 통해 갤러리 파일 선택 가능 -->
+        <div class="profile-big-avatar" id="profileImgContainer" onclick="document.getElementById('galleryInput').click()" title="클릭해서 사진 변경">
+          <span id="profileEmoji">😊</span>
+          <img id="profilePreviewImg" src="" style="display:none;" />
+        </div>
+        <input type="file" id="galleryInput" accept="image/*" style="display:none;" onchange="loadGalleryImage(event)">
+        
+        <div class="profile-nickname-text" id="myProfileName">-</div>
+        <div class="profile-status-text" id="myStatusMsg">상태 메시지가 없습니다.</div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button onclick="document.getElementById('galleryInput').click()" style="padding: 10px 20px; background: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">갤러리 사진 변경</button>
+          <button onclick="editProfile()" style="padding: 10px 20px; background: #ddd; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">상태메시지 수정</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 실제 개별 채팅방 전체화면 뷰 -->
+    <div id="chatRoomView">
+      <div class="chat-room-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="closeChatRoom()" style="padding: 6px 12px; background: #ddd; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">◀ 목록으로</button>
+          <h3 id="currentRoomTitle">대화방</h3>
+        </div>
+        <span id="currentRoomParticipants" style="font-size: 13px; color: #666;">참여 1명</span>
+      </div>
+
+      <div class="chat-messages-box" id="chatMessages">
+        <div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">
+          대화방에 입장했습니다. 자유롭게 대화를 시작해보세요!
+        </div>
+      </div>
+
+      <div class="chat-bottom-input-area">
+        <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button class="send-btn-style" onclick="sendMessage()">보내기</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 모달 1: 친구 프로필 상세보기 팝업 -->
+  <div class="modal" id="friendProfileModal">
+    <div class="modal-content" style="align-items: center; text-align: center;">
+      <h3>친구 프로필</h3>
+      <div id="modalFriendAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 40px; overflow: hidden; border: 2px solid #ffe812;">
+        👤
+      </div>
+      <h2 id="modalFriendName" style="margin-top: 5px;">이름</h2>
+      <p id="modalFriendStatus" style="color: #666; font-size: 14px;">상태 메시지</p>
+      <button onclick="closeModal('friendProfileModal')" style="padding: 8px 20px; background: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;">확인</button>
     </div>
   </div>
 
-  <!-- 모달 1: 설정 및 관리자 모드 -->
+  <!-- 모달 2: 관리자 설정 -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
-      <h3>⚙️ 설정 및 관리자 모드</h3>
-      <hr style="border: 0; border-top: 1px solid #eee;">
+      <h3>⚙️ 관리자 설정 (비밀번호 인증)</h3>
+      <label style="font-size: 13px; font-weight: bold;">🔒 관리자 비밀번호 (1217)</label>
+      <input type="password" id="adminPassword" placeholder="비밀번호 입력" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+      <button onclick="verifyAdmin()" style="padding: 10px; background: #333; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">인증하기</button>
       
-      <label style="font-size: 13px; font-weight: bold;">🔒 관리자 비밀번호 입력</label>
-      <input type="password" id="adminPassword" placeholder="비밀번호 입력" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-      <button onclick="verifyAdmin()" style="padding: 8px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">인증하기</button>
-      
-      <div id="adminPanel" style="display: none; background: #f0f0f0; padding: 10px; border-radius: 4px; font-size: 12px;">
+      <div id="adminPanel" style="display: none; background: #f0f0f0; padding: 12px; border-radius: 6px; font-size: 12px;">
         <strong style="color: green;">[관리자 인증 완료]</strong>
-        <p style="margin-top: 5px;">전체 채팅방 내역 조회가 가능합니다.</p>
+        <p style="margin-top: 5px;">전체 통합 로그 조회 및 유저 제재 권한이 활성화되었습니다.</p>
       </div>
-
-      <hr style="border: 0; border-top: 1px solid #eee; margin-top: 5px;">
-      <button onclick="handleLogout()" style="padding: 8px; background: #ff4d4d; color: white; border: none; border-radius: 4px; cursor: pointer;">로그아웃 (계정 초기화)</button>
-      <button onclick="closeModal('settingsModal')" style="padding: 6px;">닫기</button>
+      <button onclick="closeModal('settingsModal')" style="padding: 8px; background: #eee; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;">닫기</button>
     </div>
   </div>
 
-  <!-- 모달 2: 채팅방 만들기 -->
+  <!-- 모달 3: 채팅창 생성하기 -->
   <div class="modal" id="createRoomModal">
     <div class="modal-content">
-      <h3>➕ 새로운 채팅방 만들기</h3>
-      <label style="font-size: 12px;">채팅방 이름:</label>
-      <input type="text" id="newRoomNameInput" placeholder="예: 개발자 스터디룸" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <h3>➕ 새로운 채팅창 생성하기</h3>
+      <label style="font-size: 13px;">채팅방 이름:</label>
+      <input type="text" id="newRoomNameInput" placeholder="예: 재밌는 방" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
       
-      <label style="font-size: 12px; margin-top: 5px;">방 유형 선택:</label>
+      <label style="font-size: 13px; margin-top: 5px;">방 유형:</label>
       <div class="ban-options">
         <button onclick="createRoom('1:1 채팅')">1:1 채팅</button>
         <button onclick="createRoom('그룹 단톡방')">단체 대화방</button>
       </div>
-      <button onclick="closeModal('createRoomModal')" style="padding: 6px; margin-top: 5px;">취소</button>
+      <button onclick="closeModal('createRoomModal')" style="padding: 8px; background: #eee; border: none; border-radius: 6px; cursor: pointer;">취소</button>
     </div>
   </div>
 
-  <!-- 모달 3: 친구 초대 -->
+  <!-- 모달 4: 친구 추가 (초대) -->
   <div class="modal" id="inviteModal">
     <div class="modal-content">
-      <h3>👥 친구 검색 및 초대</h3>
-      <p style="font-size: 12px; color: #666;">현재 방: <strong id="inviteTargetRoomName">-</strong></p>
+      <h3>👥 친구 추가 및 초대</h3>
+      <p style="font-size: 12px; color: #666;">대상 채팅방: <strong id="inviteTargetRoomName">-</strong></p>
       
-      <label style="font-size: 12px;">가입되어 있는 친구 닉네임 검색:</label>
-      <div style="display: flex; gap: 5px;">
-        <input type="text" id="friendSearchInput" placeholder="회원 닉네임 입력" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-        <button onclick="searchAndInviteFriend()" style="padding: 8px 12px; background: #ffe812; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">초대</button>
+      <label style="font-size: 13px;">가입된 친구 닉네임 검색:</label>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="friendSearchInput" placeholder="닉네임 입력" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+        <button onclick="searchAndInviteFriend()" style="padding: 10px 15px; background: #ffe812; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">추가</button>
       </div>
-      <div id="searchResultArea" style="font-size: 12px; margin-top: 5px;"></div>
+      <div id="searchResultArea" style="font-size: 13px; margin-top: 5px;"></div>
 
-      <button onclick="closeModal('inviteModal')" style="padding: 6px; margin-top: 10px;">닫기</button>
+      <button onclick="closeModal('inviteModal')" style="padding: 8px; background: #eee; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;">닫기</button>
     </div>
   </div>
 
@@ -224,15 +245,30 @@
     let currentActiveRoom = '';
     let registeredUsers = ['User1', 'User2'];
     let chatRooms = {};
+    
+    // 추가된 친구들과 그들의 상세 정보를 저장하는 객체 (프로필/상태메시지/사진 포함)
+    let addedFriends = {
+      'User1': { status: '안녕하세요! User1입니다.', avatar: '' },
+      'User2': { status: '반갑습니다.', avatar: '' }
+    };
 
     window.onload = function() {
       const savedUser = localStorage.getItem('chat_nickname');
       if (savedUser) {
         document.getElementById('authScreen').style.display = 'none';
-        document.getElementById('currentUserDisplay').textContent = `${savedUser} 님`;
         document.getElementById('myProfileName').textContent = savedUser;
-        
         if (!registeredUsers.includes(savedUser)) registeredUsers.push(savedUser);
+      }
+
+      // [기능 1] 새로고침해도 상태 메시지와 프로필 사진이 유지되도록 불러오기[cite: 1]
+      const savedStatus = localStorage.getItem('chat_status_msg');
+      if (savedStatus) {
+        document.getElementById('myStatusMsg').textContent = savedStatus;
+      }
+
+      const savedImage = localStorage.getItem('chat_profile_img');
+      if (savedImage) {
+        applyProfileImage(savedImage);
       }
     };
 
@@ -242,40 +278,114 @@
         alert('닉네임을 입력해주세요!');
         return;
       }
-
-      const isDuplicate = registeredUsers.some(u => u.toLowerCase() === nickname.toLowerCase());
-      if (isDuplicate) {
-        alert(`'${nickname}'은 이미 누군가가 사용 중인 닉네임입니다. 다른 이름을 사용해 주세요.`);
+      if (registeredUsers.map(u => u.toLowerCase()).includes(nickname.toLowerCase())) {
+        alert('이미 사용 중인 닉네임입니다.');
         return;
       }
-
       localStorage.setItem('chat_nickname', nickname);
       registeredUsers.push(nickname);
 
       alert(`${nickname}님 환영합니다!`);
       document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('currentUserDisplay').textContent = `${nickname} 님`;
       document.getElementById('myProfileName').textContent = nickname;
     }
 
-    // 탭 전환 (채팅 vs 내 프로필)
-    function switchTab(tabId, btnElem) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      
-      document.getElementById(tabId).classList.add('active');
-      btnElem.classList.add('active');
-    }
-
-    // 프로필 수정
-    function editProfile() {
-      const newStatus = prompt('변경할 상태 메시지를 입력하세요:', document.getElementById('myStatusMsg').textContent);
-      if (newStatus !== null) {
-        document.getElementById('myStatusMsg').textContent = newStatus || '상태 메시지가 없습니다.';
+    // [기능 2] 갤러리에서 선택한 이미지를 읽어와서 저장 및 반영하기[cite: 1]
+    function loadGalleryImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64Image = e.target.result;
+          localStorage.setItem('chat_profile_img', base64Image); // 브라우저 영구 저장[cite: 1]
+          applyProfileImage(base64Image);
+        };
+        reader.readAsDataURL(file);
       }
     }
 
-    // 채팅방 클릭 시 전체화면 확장 진입
+    function applyProfileImage(imgSrc) {
+      const emojiElem = document.getElementById('profileEmoji');
+      const imgElem = document.getElementById('profilePreviewImg');
+      
+      emojiElem.style.display = 'none';
+      imgElem.style.display = 'block';
+      imgElem.src = imgSrc;
+    }
+
+    // [기능 1] 상태 메시지 영구 수정 및 저장[cite: 1]
+    function editProfile() {
+      const currentMsg = document.getElementById('myStatusMsg').textContent;
+      const newStatus = prompt('변경할 상태 메시지를 입력하세요:', currentMsg === '상태 메시지가 없습니다.' ? '' : currentMsg);
+      if (newStatus !== null) {
+        const finalMsg = newStatus.trim() || '상태 메시지가 없습니다.';
+        document.getElementById('myStatusMsg').textContent = finalMsg;
+        localStorage.setItem('chat_status_msg', finalMsg); // 영구 저장[cite: 1]
+      }
+    }
+
+    // 탭 전환
+    function switchMainTab(tabId) {
+      closeChatRoom();
+
+      document.querySelectorAll('.content-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
+      if (tabId === 'tabChatList') document.getElementById('btnTabChat').classList.add('active');
+      if (tabId === 'tabFriendsList') document.getElementById('btnTabFriends').classList.add('active');
+      if (tabId === 'tabProfile') document.getElementById('btnTabProfile').classList.add('active');
+    }
+
+    // [기능 3] 친구 목록 탭에 추가된 친구들을 렌더링하고 클릭 시 프로필 팝업 띄우기[cite: 1]
+    function renderFriendsList() {
+      const container = document.getElementById('friendsListContainer');
+      const friendNames = Object.keys(addedFriends);
+
+      if (friendNames.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다.</div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      friendNames.forEach(fName => {
+        const fData = addedFriends[fName];
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        item.onclick = function() { openFriendProfile(fName); }; // 클릭 시 프로필 보기[cite: 1]
+        
+        let avatarContent = `👤`;
+        if (fData.avatar) {
+          avatarContent = `<img src="${fData.avatar}">`;
+        }
+
+        item.innerHTML = `
+          <div class="item-avatar">${avatarContent}</div>
+          <div>
+            <div class="item-name">${fName}</div>
+            <div class="item-sub">${fData.status}</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // 친구 프로필 모달 열기[cite: 1]
+    function openFriendProfile(fName) {
+      const fData = addedFriends[fName];
+      document.getElementById('modalFriendName').textContent = fName;
+      document.getElementById('modalFriendStatus').textContent = fData.status;
+      
+      const avatarBox = document.getElementById('modalFriendAvatar');
+      if (fData.avatar) {
+        avatarBox.innerHTML = `<img src="${fData.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+      } else {
+        avatarBox.innerHTML = `👤`;
+      }
+
+      document.getElementById('friendProfileModal').style.display = 'flex';
+    }
+
     function enterRoom(roomName) {
       currentActiveRoom = roomName;
       document.getElementById('currentRoomTitle').textContent = roomName;
@@ -284,14 +394,16 @@
       document.getElementById('currentRoomParticipants').textContent = `참여 ${pList.length}명 (${pList.join(', ')})`;
       
       const chatMessages = document.getElementById('chatMessages');
-      chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${roomName}' 방에 입장했습니다.</div>`;
+      chatMessages.innerHTML = `<div class="message received" style="background: #fff; text-align: center; width: 100%; color: #666;">'${roomName}' 대화방에 입장했습니다.</div>`;
 
-      // 전체화면 클래스 토글 (모바일 기기 전용)
-      document.body.classList.add('in-chat');
+      document.querySelectorAll('.content-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('chatRoomView').classList.add('active');
     }
 
-    function leaveChatRoom() {
-      document.body.classList.remove('in-chat');
+    function closeChatRoom() {
+      document.getElementById('chatRoomView').classList.remove('active');
+      document.getElementById('tabChatList').classList.add('active');
+      currentActiveRoom = '';
     }
 
     function openCreateRoomModal() {
@@ -305,9 +417,8 @@
         alert('채팅방 이름을 입력해주세요!');
         return;
       }
-
       if (chatRooms[roomName]) {
-        alert(`'${roomName}' 이름의 채팅방이 이미 존재합니다.`);
+        alert(`'${roomName}' 이름의 방이 이미 존재합니다.`);
         return;
       }
 
@@ -316,24 +427,25 @@
 
       const container = document.getElementById('roomListContainer');
       const roomDiv = document.createElement('div');
-      roomDiv.className = 'room-item';
+      roomDiv.className = 'list-item';
       roomDiv.onclick = function() { enterRoom(roomName); };
       roomDiv.innerHTML = `
+        <div class="item-avatar">💬</div>
         <div>
-          <div class="room-name">${roomName}</div>
-          <div class="room-info" id="info-${roomName}">${type} • 참여 1명</div>
+          <div class="item-name">${roomName}</div>
+          <div class="item-sub" id="info-${roomName}">${type} • 참여 1명</div>
         </div>
       `;
       container.appendChild(roomDiv);
 
-      alert(`'${roomName}' (${type}) 방이 생성되었습니다!`);
       closeModal('createRoomModal');
+      switchMainTab('tabChatList');
       enterRoom(roomName);
     }
 
     function openInviteModal() {
       if (!currentActiveRoom) {
-        alert('먼저 채팅방을 선택하거나 만들어주세요!');
+        alert('먼저 대화방에 입장해 주세요!');
         return;
       }
       document.getElementById('inviteTargetRoomName').textContent = currentActiveRoom;
@@ -342,49 +454,54 @@
       document.getElementById('inviteModal').style.display = 'flex';
     }
 
+    // [기능 3] 친구 추가 시 '친구 목록'에 자동 등록되도록 구현[cite: 1]
     function searchAndInviteFriend() {
       const friendName = document.getElementById('friendSearchInput').value.trim();
       const resultArea = document.getElementById('searchResultArea');
       const currentUser = localStorage.getItem('chat_nickname');
 
       if (!friendName) {
-        alert('초대할 회원의 닉네임을 입력하세요.');
+        alert('친구 닉네임을 입력하세요.');
         return;
       }
-
       if (friendName === currentUser) {
-        resultArea.innerHTML = `<span style="color: red;">자기 자신은 초대할 수 없습니다.</span>`;
+        resultArea.innerHTML = `<span style="color: red;">자기 자신은 추가할 수 없습니다.</span>`;
+        return;
+      }
+      if (!registeredUsers.map(u => u.toLowerCase()).includes(friendName.toLowerCase())) {
+        resultArea.innerHTML = `<span style="color: red;">🚫 가입되지 않은 회원입니다.</span>`;
         return;
       }
 
-      const isRegistered = registeredUsers.some(user => user.toLowerCase() === friendName.toLowerCase());
-      if (!isRegistered) {
-        resultArea.innerHTML = `<span style="color: red;">🚫 '${friendName}' 님은 가입된 회원이 아닙니다.</span>`;
-        return;
+      // 친구 목록(addedFriends)에 없으면 새로 등록
+      if (!addedFriends[friendName]) {
+        addedFriends[friendName] = { status: '반갑습니다!', avatar: '' };
       }
 
+      // 채팅방 참여 중인지 체크
       if (chatRooms[currentActiveRoom].participants.includes(friendName)) {
-        resultArea.innerHTML = `<span style="color: red;">'${friendName}' 님은 이미 이 방에 참여 중입니다.</span>`;
+        resultArea.innerHTML = `<span style="color: red;">이미 이 방에 참여 중인 친구입니다.</span>`;
         return;
       }
 
       chatRooms[currentActiveRoom].participants.push(friendName);
-      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 초대했습니다!</span>`;
+      renderFriendsList(); // 친구 목록 갱신[cite: 1]
+
+      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 친구 추가 및 방에 초대했습니다![cite: 1]</span>`;
       
       const pCount = chatRooms[currentActiveRoom].participants.length;
       const typeStr = chatRooms[currentActiveRoom].type;
       const infoElem = document.getElementById(`info-${currentActiveRoom}`);
       if (infoElem) infoElem.textContent = `${typeStr} • 참여 ${pCount}명`;
 
-      enterRoom(currentActiveRoom);
+      setTimeout(() => {
+        closeModal('inviteModal');
+        enterRoom(currentActiveRoom);
+      }, 1000);
     }
 
     function sendMessage() {
-      if (!currentActiveRoom) {
-        alert('먼저 채팅방을 선택하거나 만들어주세요!');
-        return;
-      }
-
+      if (!currentActiveRoom) return;
       const input = document.getElementById('messageInput');
       if (!input.value.trim()) return;
 
@@ -408,16 +525,18 @@
       const inputPw = document.getElementById('adminPassword').value;
       if (inputPw === '1217') { 
         isAdmin = true;
-        alert('관리자 인증에 성공했습니다.');
+        alert('관리자 인증 성공!');
         document.getElementById('adminPanel').style.display = 'block';
       } else {
-        alert('비밀번호가 올바르지 않습니다.');
+        alert('비밀번호가 틀렸습니다.');
       }
     }
 
     function handleLogout() {
-      if (confirm('정말 로그아웃 하시겠습니까? 저장된 계정이 초기화됩니다.')) {
+      if (confirm('정말 로그아웃 하시겠습니까?')) {
         localStorage.removeItem('chat_nickname');
+        localStorage.removeItem('chat_status_msg');
+        localStorage.removeItem('chat_profile_img');
         location.reload();
       }
     }
