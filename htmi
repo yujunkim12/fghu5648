@@ -4,7 +4,7 @@ HTML
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>카카오톡 스타일 메신저 (관리자 비밀번호 인증 포함)</title>
+  <title>카카오톡 스타일 메신저 (중복 이름 방지 기능 포함)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; }
     body { display: flex; height: 100vh; background-color: #f0f0f0; }
@@ -25,11 +25,17 @@ HTML
     .auth-box button:hover { background-color: #f5dc00; }
 
     /* 사이드바 */
-    .sidebar { width: 280px; background-color: #ffe812; display: flex; flex-direction: column; border-right: 1px solid #ddd; }
+    .sidebar { width: 300px; background-color: #ffe812; display: flex; flex-direction: column; border-right: 1px solid #ddd; }
     .sidebar-header { padding: 15px; font-weight: bold; background-color: #f7e314; display: flex; justify-content: space-between; align-items: center; }
+    .sidebar-menu { padding: 10px 15px; display: flex; gap: 5px; background-color: #fae100; border-bottom: 1px solid #e0c800; }
+    .sidebar-menu button { flex: 1; padding: 6px; font-size: 11px; font-weight: bold; border: none; border-radius: 4px; background: white; cursor: pointer; }
+    .sidebar-menu button:hover { background: #f0f0f0; }
+    
     .room-list { flex: 1; overflow-y: auto; }
-    .room-item { padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
+    .room-item { padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .room-item:hover { background-color: #f5dc00; }
+    .room-name { font-weight: bold; font-size: 14px; }
+    .room-info { font-size: 11px; color: #666; }
 
     /* 메인 채팅창 */
     .chat-container { flex: 1; display: flex; flex-direction: column; background-color: #bacee0; }
@@ -47,8 +53,8 @@ HTML
     .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
     .chat-input-area button { padding: 10px 20px; background-color: #ffe812; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-    /* 버튼 & 모달 스타일 */
-    .settings-btn { background-color: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    /* 공통 버튼 & 모달 스타일 */
+    .action-btn { background-color: #333; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
     .modal-content { background: white; padding: 20px; border-radius: 8px; width: 400px; display: flex; flex-direction: column; gap: 12px; }
     .ban-options { display: flex; gap: 10px; }
@@ -70,23 +76,34 @@ HTML
     </div>
   </div>
 
-  <!-- 왼쪽: 채팅방 목록 -->
+  <!-- 왼쪽: 사이드바 -->
   <div class="sidebar">
     <div class="sidebar-header">
       <span id="currentUserDisplay">채팅 목록</span>
-      <button class="settings-btn" onclick="openSettingsModal()">⚙️ 설정</button>
+      <button class="action-btn" onclick="openSettingsModal()">⚙️ 설정</button>
     </div>
-    <div class="room-list">
-      <div class="room-item"><strong>자유 수다방</strong></div>
-      <div class="room-item"><strong>개발자 모임</strong></div>
+    
+    <div class="sidebar-menu">
+      <button onclick="openCreateRoomModal()">➕ 채팅방 만들기</button>
+      <button onclick="openInviteModal()">👥 친구 검색/초대</button>
+    </div>
+
+    <!-- 채팅방 목록 -->
+    <div class="room-list" id="roomListContainer">
+      <div class="room-item" onclick="enterRoom('자유 수다방')">
+        <div>
+          <div class="room-name">자유 수다방</div>
+          <div class="room-info" id="info-자유 수다방">그룹 • 참여 3명</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- 오른쪽: 메인 채팅창 -->
   <div class="chat-container">
     <div class="chat-header">
-      <h3>자유 수다방</h3>
-      <span style="font-size: 12px; color: #666;">참여 3명</span>
+      <h3 id="currentRoomTitle">자유 수다방</h3>
+      <span id="currentRoomParticipants" style="font-size: 12px; color: #666;">참여 3명</span>
     </div>
 
     <div class="chat-messages" id="chatMessages">
@@ -101,19 +118,19 @@ HTML
     </div>
 
     <div class="chat-input-area">
-      <input type="text" id="messageInput" placeholder="메시지를 입력하세요...">
+      <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
       <button onclick="sendMessage()">전송</button>
     </div>
   </div>
 
-  <!-- 모달 1: 설정 창 -->
+  <!-- 모달 1: 설정 및 관리자 모드 -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
       <h3>⚙️ 설정 및 관리자 모드</h3>
       <hr style="border: 0; border-top: 1px solid #eee;">
       
       <label style="font-size: 13px; font-weight: bold;">🔒 관리자 비밀번호 입력</label>
-      <input type="password" id="adminPassword" placeholder="비밀번호 (1217)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <input type="password" id="adminPassword" placeholder="비밀번호 입력" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
       <button onclick="verifyAdmin()" style="padding: 8px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">인증하기</button>
       
       <div id="adminPanel" style="display: none; background: #f0f0f0; padding: 10px; border-radius: 4px; font-size: 12px;">
@@ -122,8 +139,7 @@ HTML
         
         <div style="margin-top: 8px; max-height: 120px; overflow-y: auto; background: white; padding: 8px; border: 1px solid #ddd;">
           <strong>📁 [전체 채팅방 통합 로그]</strong>
-          <p style="margin-top: 4px; color: #333;">• [자유방] 홍길동: 안녕하세요! 오늘 날씨 좋네요.</p>
-          <p style="color: #333;">• [개발방] 김철수: 테스트 메시지입니다.</p>
+          <p style="margin-top: 4px; color: #333;">• [자유방] 홍길동: 안녕하세요!</p>
         </div>
       </div>
 
@@ -133,14 +149,14 @@ HTML
     </div>
   </div>
 
-  <!-- 모달 2: 사용자 정지 처리 (관리자 비밀번호 재확인 필수) -->
+  <!-- 모달 2: 사용자 정지 처리 -->
   <div class="modal" id="banModal">
     <div class="modal-content">
       <h3>🚫 사용자 이용 정지</h3>
       <p>대상 사용자: <strong id="banTargetUser">-</strong></p>
       
       <label style="font-size: 12px; font-weight: bold;">🔒 관리자 비밀번호 입력:</label>
-      <input type="password" id="banAdminPassword" placeholder="비밀번호 (1217)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <input type="password" id="banAdminPassword" placeholder="비밀번호 입력" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
 
       <label style="font-size: 12px; margin-top: 5px;">정지 기간 선택:</label>
       <div class="ban-options">
@@ -152,28 +168,92 @@ HTML
     </div>
   </div>
 
+  <!-- 모달 3: 채팅방 만들기 -->
+  <div class="modal" id="createRoomModal">
+    <div class="modal-content">
+      <h3>➕ 새로운 채팅방 만들기</h3>
+      <label style="font-size: 12px;">채팅방 이름 (또는 상대방 이름):</label>
+      <input type="text" id="newRoomNameInput" placeholder="예: 개발자 스터디룸" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      
+      <label style="font-size: 12px; margin-top: 5px;">방 유형 선택:</label>
+      <div class="ban-options">
+        <button onclick="createRoom('1:1 채팅')">1:1 채팅</button>
+        <button onclick="createRoom('그룹 단톡방')">단체 대화방</button>
+      </div>
+      <button onclick="closeModal('createRoomModal')" style="padding: 6px; margin-top: 5px;">취소</button>
+    </div>
+  </div>
+
+  <!-- 모달 4: 친구 검색 및 초대 -->
+  <div class="modal" id="inviteModal">
+    <div class="modal-content">
+      <h3>👥 친구 검색 및 초대</h3>
+      <p style="font-size: 12px; color: #666;">현재 방: <strong id="inviteTargetRoomName">자유 수다방</strong></p>
+      
+      <label style="font-size: 12px;">초대할 친구 닉네임 검색:</label>
+      <div style="display: flex; gap: 5px;">
+        <input type="text" id="friendSearchInput" placeholder="닉네임 입력 (예: 영희)" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <button onclick="searchAndInviteFriend()" style="padding: 8px 12px; background: #ffe812; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">초대</button>
+      </div>
+      <div id="searchResultArea" style="font-size: 12px; color: #333; margin-top: 5px;"></div>
+
+      <button onclick="closeModal('inviteModal')" style="padding: 6px; margin-top: 10px;">닫기</button>
+    </div>
+  </div>
+
   <script>
     let isAdmin = false;
     let selectedUserForBan = '';
+    let currentActiveRoom = '자유 수다방';
+    
+    // 기본 등록되어 있는 기존 유저 데이터 (닉네임 중복 검증용)
+    let existingUsers = ['홍길동', '김철수', 'User1', 'User2'];
+
+    // 전체 채팅방 목록 및 참여 인원 데이터 구조
+    let chatRooms = {
+      '자유 수다방': { type: '그룹', participants: ['홍길동', '김철수'] }
+    };
 
     window.onload = function() {
       const savedUser = localStorage.getItem('chat_nickname');
       if (savedUser) {
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('currentUserDisplay').textContent = `${savedUser} 님`;
+        
+        // 유저 목록에 현재 유저 등록
+        if (!existingUsers.includes(savedUser)) existingUsers.push(savedUser);
+        if (!chatRooms['자유 수다방'].participants.includes(savedUser)) {
+          chatRooms['자유 수다방'].participants.push(savedUser);
+        }
+        enterRoom('자유 수다방');
       }
     };
 
+    // 1. 회원가입 시 닉네임 중복 검사
     function handleRegister() {
       const nickname = document.getElementById('nicknameInput').value.trim();
+      
       if (!nickname) {
         alert('닉네임을 입력해주세요!');
         return;
       }
+
+      // 대소문자 구분 없이 중복 체크
+      const isDuplicate = existingUsers.some(u => u.toLowerCase() === nickname.toLowerCase());
+      if (isDuplicate) {
+        alert(`'${nickname}'은 이미 누군가가 사용 중인 닉네임입니다. 다른 이름을 입력하세요.`);
+        return;
+      }
+
+      // 중복이 아니면 저장
       localStorage.setItem('chat_nickname', nickname);
+      existingUsers.push(nickname);
+      chatRooms['자유 수다방'].participants.push(nickname);
+
       alert(`${nickname}님 환영합니다!`);
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('currentUserDisplay').textContent = `${nickname} 님`;
+      enterRoom('자유 수다방');
     }
 
     function handleLogout() {
@@ -181,6 +261,102 @@ HTML
         localStorage.removeItem('chat_nickname');
         location.reload();
       }
+    }
+
+    // 채팅방 입장 및 전환
+    function enterRoom(roomName) {
+      currentActiveRoom = roomName;
+      document.getElementById('currentRoomTitle').textContent = roomName;
+      
+      const pList = chatRooms[roomName] ? chatRooms[roomName].participants : [];
+      document.getElementById('currentRoomParticipants').textContent = `참여 ${pList.length}명 (${pList.join(', ')})`;
+    }
+
+    function openCreateRoomModal() {
+      document.getElementById('newRoomNameInput').value = '';
+      document.getElementById('createRoomModal').style.display = 'flex';
+    }
+
+    // 2. 채팅방 생성 시 방 이름 중복 검사
+    function createRoom(type) {
+      const roomName = document.getElementById('newRoomNameInput').value.trim();
+      if (!roomName) {
+        alert('채팅방 이름을 입력해주세요!');
+        return;
+      }
+
+      // 채팅방 이름 중복 검사
+      const isRoomDuplicate = Object.keys(chatRooms).some(name => name.toLowerCase() === roomName.toLowerCase());
+      if (isRoomDuplicate) {
+        alert(`'${roomName}' 이름의 채팅방이 이미 존재합니다. 다른 방 이름을 사용해 주세요.`);
+        return;
+      }
+
+      const currentUser = localStorage.getItem('chat_nickname') || '나';
+      chatRooms[roomName] = { type: type, participants: [currentUser] };
+
+      // 사이드바 목록에 추가
+      const container = document.getElementById('roomListContainer');
+      const roomDiv = document.createElement('div');
+      roomDiv.className = 'room-item';
+      roomDiv.onclick = () => enterRoom(roomName);
+      roomDiv.innerHTML = `
+        <div>
+          <div class="room-name">${roomName}</div>
+          <div class="room-info" id="info-${roomName}">${type} • 참여 1명</div>
+        </div>
+      `;
+      container.appendChild(roomDiv);
+
+      alert(`'${roomName}' (${type}) 방이 생성되었습니다!`);
+      closeModal('createRoomModal');
+      enterRoom(roomName);
+    }
+
+    function openInviteModal() {
+      document.getElementById('inviteTargetRoomName').textContent = currentActiveRoom;
+      document.getElementById('friendSearchInput').value = '';
+      document.getElementById('searchResultArea').textContent = '';
+      document.getElementById('inviteModal').style.display = 'flex';
+    }
+
+    // 3. 친구 초대 시 이미 들어와 있는 인원 중복 체크
+    function searchAndInviteFriend() {
+      const friendName = document.getElementById('friendSearchInput').value.trim();
+      const resultArea = document.getElementById('searchResultArea');
+      const currentUser = localStorage.getItem('chat_nickname');
+
+      if (!friendName) {
+        alert('검색할 친구 닉네임을 입력하세요.');
+        return;
+      }
+
+      if (friendName === currentUser) {
+        resultArea.innerHTML = `<span style="color: red;">자기 자신은 초대할 수 없습니다.</span>`;
+        return;
+      }
+
+      // 방 참여 인원 중복 검사
+      if (chatRooms[currentActiveRoom].participants.includes(friendName)) {
+        resultArea.innerHTML = `<span style="color: red;">'${friendName}'님은 이미 이 방에 참여 중입니다. (중복 불가)</span>`;
+        return;
+      }
+
+      // 유저 목록에 없는 경우 등록 처리
+      if (!existingUsers.includes(friendName)) {
+        existingUsers.push(friendName);
+      }
+
+      chatRooms[currentActiveRoom].participants.push(friendName);
+      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}'님을 성공적으로 초대했습니다!</span>`;
+      
+      // 방 인원 정보 실시간 업데이트
+      const pCount = chatRooms[currentActiveRoom].participants.length;
+      const typeStr = chatRooms[currentActiveRoom].type;
+      const infoElem = document.getElementById(`info-${currentActiveRoom}`);
+      if (infoElem) infoElem.textContent = `${typeStr} • 참여 ${pCount}명`;
+
+      enterRoom(currentActiveRoom);
     }
 
     function sendMessage() {
@@ -202,7 +378,6 @@ HTML
       document.getElementById('settingsModal').style.display = 'flex';
     }
 
-    // 설정창 비밀번호 인증
     function verifyAdmin() {
       const inputPw = document.getElementById('adminPassword').value;
       if (inputPw === '1217') { 
@@ -214,20 +389,17 @@ HTML
       }
     }
 
-    // 이용 정지 팝업 오픈
     function openBanModal(username) {
       selectedUserForBan = username;
       document.getElementById('banTargetUser').textContent = username;
-      document.getElementById('banAdminPassword').value = ''; // 비밀번호 입력창 초기화
+      document.getElementById('banAdminPassword').value = '';
       document.getElementById('banModal').style.display = 'flex';
     }
 
-    // 정지 버튼 클릭 시 관리자 비밀번호 검증 후 처리
     function applyBan(days) {
       const inputPw = document.getElementById('banAdminPassword').value;
-
       if (inputPw !== '1217') {
-        alert('관리자 비밀번호(1217)가 올바르지 않습니다.');
+        alert('관리자 비밀번호가 올바르지 않습니다.');
         return;
       }
 
@@ -238,6 +410,9 @@ HTML
     function closeModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
     }
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
