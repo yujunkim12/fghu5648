@@ -26,25 +26,29 @@
     /* 왼쪽 고정 메뉴 바 */
     .left-menu-bar { 
       width: 240px; background-color: #2b2b2b; display: flex; flex-direction: column; 
-      height: 100vh; border-right: 1px solid #1a1a1a; 
+      height: 100vh; border-right: 1px solid #1a1a1a; flex-shrink: 0;
     }
-    .menu-items-group { display: flex; flex-direction: column; padding: 15px 12px; gap: 10px; }
-    
-    .menu-btn {
-      background-color: #3d3d3d; color: white; border: none; padding: 15px; 
-      border-radius: 8px; font-size: 16px; font-weight: bold; text-align: left; 
-      cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+    .menu-header-title {
+      padding: 20px 15px 5px 15px;
     }
-    .menu-btn:hover, .menu-btn.active { background-color: #ffe812; color: #000; }
 
-    .menu-bottom-group { 
+    /* 하단 버튼 영역을 맨 밑으로 밀착 */
+    .menu-bottom-container { 
       margin-top: auto; 
       padding: 15px 12px; 
-      border-top: 1px solid #3d3d3d; 
       display: flex; 
       flex-direction: column; 
       gap: 8px; 
+      border-top: 1px solid #3d3d3d;
     }
+
+    .menu-btn {
+      background-color: #3d3d3d; color: white; border: none; padding: 14px; 
+      border-radius: 8px; font-size: 15px; font-weight: bold; text-align: left; 
+      cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px;
+      width: 100%;
+    }
+    .menu-btn:hover, .menu-btn.active { background-color: #ffe812; color: #000; }
 
     /* 우측 메인 콘텐츠 패널 영역 */
     .main-panel-area { flex: 1; display: flex; height: 100vh; background-color: #fffbe9; position: relative; overflow: hidden; }
@@ -108,16 +112,20 @@
 
   <!-- 왼쪽 고정 메뉴 바 -->
   <div class="left-menu-bar">
-    <div class="menu-items-group">
-      <h3 style="color: #ffe812; padding: 5px 10px; font-size: 18px; margin-bottom: 5px;">카카오톡 메뉴</h3>
+    <div class="menu-header-title">
+      <h3 style="color: #ffe812; font-size: 18px;">카카오톡 메뉴</h3>
+    </div>
+
+    <!-- 하단 메뉴 버튼 영역 -->
+    <div class="menu-bottom-container">
       <button class="menu-btn" onclick="openCreateRoomModal()">➕ 채팅창 생성하기</button>
       <button class="menu-btn" onclick="openInviteModal()">👥 친구 추가(초대)</button>
       <button class="menu-btn active" id="btnTabChat" onclick="switchMainTab('tabChatList')">💬 대화창 목록</button>
       <button class="menu-btn" id="btnTabFriends" onclick="switchMainTab('tabFriendsList')">👥 친구 목록</button>
       <button class="menu-btn" id="btnTabProfile" onclick="switchMainTab('tabProfile')">👤 프로필</button>
-    </div>
-
-    <div class="menu-bottom-group">
+      
+      <hr style="border: 0; border-top: 1px solid #444; margin: 4px 0;">
+      
       <button class="menu-btn" onclick="openSettingsModal()" style="background-color: #444; font-size: 14px;">⚙️ 관리자 설정</button>
       <button class="menu-btn" onclick="handleLogout()" style="background-color: #a83232; font-size: 14px;">🚪 로그아웃</button>
     </div>
@@ -136,7 +144,7 @@
     <div class="content-tab" id="tabFriendsList">
       <div class="tab-header"><span>👥 추가된 친구 목록</span></div>
       <div class="list-container" id="friendsListContainer">
-        <div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다. '친구 추가'를 통해 친구를 등록해보세요!</div>
+        <div style="padding: 20px; text-align: center; color: #777;">추가된 친구가 없습니다. '친구 추가'를 통해 친구를 등록해보세요![cite: 1]</div>
       </div>
     </div>
 
@@ -193,7 +201,7 @@
     </div>
   </div>
 
-  <!-- 모달 2: 관리자 설정 (비밀번호 숨김 처리) -->
+  <!-- 모달 2: 관리자 설정 -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
       <h3>⚙️ 관리자 설정 (비밀번호 인증)</h3>
@@ -303,6 +311,7 @@
       document.getElementById('authScreen').style.display = 'none';
       document.getElementById('myProfileName').textContent = nickname;
       renderFriendsList();
+      renderChatRoomsList();
     }
 
     function loadGalleryImage(event) {
@@ -311,7 +320,7 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const base64Image = e.target.result;
-          localStorage.setItem('chat_profile_img', base64Image);
+          localStorage.setItem('chat_profile_img', base64Image);[cite: 1]
           applyProfileImage(base64Image);
         };
         reader.readAsDataURL(file);
@@ -333,7 +342,7 @@
       if (newStatus !== null) {
         const finalMsg = newStatus.trim() || '상태 메시지가 없습니다.';
         document.getElementById('myStatusMsg').textContent = finalMsg;
-        localStorage.setItem('chat_status_msg', finalMsg);
+        localStorage.setItem('chat_status_msg', finalMsg);[cite: 1]
       }
     }
 
@@ -344,7 +353,10 @@
       document.getElementById(tabId).classList.add('active');
 
       document.querySelectorAll('.menu-btn').forEach(el => el.classList.remove('active'));
-      if (tabId === 'tabChatList') document.getElementById('btnTabChat').classList.add('active');
+      if (tabId === 'tabChatList') {
+        document.getElementById('btnTabChat').classList.add('active');
+        renderChatRoomsList();
+      }
       if (tabId === 'tabFriendsList') document.getElementById('btnTabFriends').classList.add('active');
       if (tabId === 'tabProfile') document.getElementById('btnTabProfile').classList.add('active');
     }
@@ -363,7 +375,7 @@
         const fData = addedFriends[fName];
         const item = document.createElement('div');
         item.className = 'list-item';
-        item.onclick = function() { openFriendProfile(fName); };
+        item.onclick = function() { openFriendProfile(fName); };[cite: 1]
         
         let avatarContent = `👤`;
         if (fData.avatar) {
@@ -520,7 +532,7 @@
       switchMainTab('tabChatList');
       renderChatRoomsList();
 
-      alert(`'${roomName}' 대화방이 생성되었습니다!`);
+      alert(`'${roomName}' 대화방이 생성되어 대화창 목록에 추가되었습니다!`);
     }
 
     function openInviteModal() {
@@ -570,7 +582,7 @@
       renderFriendsList();
       renderChatRoomsList();
 
-      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 대화 상대방으로 추가했습니다!</span>`;
+      resultArea.innerHTML = `<span style="color: green;">🎉 '${friendName}' 님을 대화 상대방으로 추가했습니다![cite: 1]</span>`;
       
       const pCount = chatRooms[currentActiveRoom].participants.length;
       document.getElementById('currentRoomParticipants').textContent = `참여 ${pCount}명 (${chatRooms[currentActiveRoom].participants.join(', ')})`;
